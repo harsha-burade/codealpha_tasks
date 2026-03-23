@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Gallery</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Image Gallery</h1>
+
+<div class="filters">
+  <button onclick="filterImages('all')">All</button>
+  <button onclick="filterImages('nature')">Nature</button>
+  <button onclick="filterImages('city')">City</button>
+</div>
+
+<!-- Upload -->
+<div class="upload-box">
+  <input type="file" id="upload" multiple accept="image/*">
+</div>
+
+<div class="gallery" id="gallery"></div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <span class="close" onclick="closeLightbox()">&times;</span>
+  <img id="lightbox-img">
+  <div class="controls">
+    <button onclick="prevImage()">Prev</button>
+    <button onclick="nextImage()">Next</button>
+  </div>
+</div>
+
+<script>
+const gallery = document.getElementById('gallery');
+let images = [];
+let currentIndex = 0;
+
+// Auto generate 25 images
+for (let i = 0; i < 25; i++) {
+  let category = i % 2 === 0 ? 'nature' : 'city';
+  let img = document.createElement('img');
+  img.src = `https://picsum.photos/400/300?random=${i}`;
+  img.classList.add(category);
+  img.onclick = () => openLightbox(images.indexOf(img));
+  gallery.appendChild(img);
+  images.push(img);
+}
+
+// Upload images
+document.getElementById('upload').addEventListener('change', function() {
+  for (let file of this.files) {
+    let reader = new FileReader();
+    reader.onload = function(e) {
+      let img = document.createElement('img');
+      img.src = e.target.result;
+      img.classList.add('nature');
+      img.onclick = () => openLightbox(images.indexOf(img));
+      gallery.appendChild(img);
+      images.push(img);
+    }
+    reader.readAsDataURL(file);
+  }
+});
+
+function openLightbox(index) {
+  currentIndex = index;
+  document.getElementById('lightbox').style.display = 'flex';
+  showImage();
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').style.display = 'none';
+}
+
+function showImage() {
+  document.getElementById('lightbox-img').src = images[currentIndex].src;
+}
+
+function nextImage() {
+  currentIndex = (currentIndex + 1) % images.length;
+  showImage();
+}
+
+function prevImage() {
+  currentIndex = (currentIndex - 1 + images.length) % images.length;
+  showImage();
+}
+
+function filterImages(category) {
+  images.forEach(img => {
+    img.style.display =
+      category === 'all' || img.classList.contains(category)
+      ? 'block'
+      : 'none';
+  });
+}
+</script>
+
+</body>
+</html>
